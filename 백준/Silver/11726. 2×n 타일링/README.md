@@ -12,7 +12,7 @@
 
 ### 제출 일자
 
-2024년 11월 6일 11:09:13
+2024년 12월 2일 14:53:39
 
 ### 문제 설명
 
@@ -20,7 +20,7 @@
 
 <p>아래 그림은 2×5 크기의 직사각형을 채운 한 가지 방법의 예이다.</p>
 
-<p style="text-align: center;"><img alt="" src="https://onlinejudgeimages.s3-ap-northeast-1.amazonaws.com/problem/11726/1.png" style="height:50px; width:125px"></p>
+<p style="text-align: center;"><img alt="" src="" style="height:50px; width:125px"></p>
 
 ### 입력 
 
