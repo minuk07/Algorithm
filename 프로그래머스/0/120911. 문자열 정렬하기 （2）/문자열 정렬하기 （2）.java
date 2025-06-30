@@ -18,11 +18,11 @@ class Solution {
 //             System.out.print(str[i] + " ");
 //         }
         
-        String answer = "";
+//         String answer = "";
         
-        for(char c : str){
-            answer += c;
-        }
-        return answer;
+//         for(char c : str){
+//             answer += c;
+//         }
+        return new String(str);
     }
 }
