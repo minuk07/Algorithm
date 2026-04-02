@@ -13,7 +13,6 @@ class Main {
 
     static class Bus{
         int dest, cost;
-
         Bus(int dest, int cost){
             this.dest = dest; this.cost = cost;
         }
@@ -22,11 +21,13 @@ class Main {
     static void dijkstra(int start){
         boolean[] visited = new boolean[n+1];
         dist = new int[n+1];
-
         Arrays.fill(dist, INF);
         dist[start] = 0;
 
-        PriorityQueue<Bus> pq = new PriorityQueue<>((a,b) -> a.cost - b.cost);
+        PriorityQueue<Bus> pq = new PriorityQueue<>((a,b) -> 
+            a.cost - b.cost
+        );
+
         pq.add(new Bus(start, 0));
 
         while(!pq.isEmpty()){
@@ -36,7 +37,8 @@ class Main {
             visited[cur.dest] = true;
 
             for(Bus ad : graph[cur.dest]){
-                if(!visited[ad.dest] && dist[ad.dest]> dist[cur.dest] + ad.cost){
+                if(!visited[ad.dest] &&
+                      dist[ad.dest] > dist[cur.dest] + ad.cost){
 
                     prev[ad.dest] = cur.dest;
                     dist[ad.dest] = dist[cur.dest] + ad.cost;
@@ -44,6 +46,7 @@ class Main {
                 }
             }
         }
+        
     }
     
     public static void main(String[] args) throws IOException {
@@ -56,7 +59,8 @@ class Main {
 
         graph = new ArrayList[n + 1];
         prev = new int[n+1];
-
+        Arrays.fill(prev, -1);
+        
         for(int i=1; i<n+1; i++){
             graph[i] = new ArrayList<>();
         }
@@ -80,27 +84,26 @@ class Main {
         if(dist[destCity] == INF){
             System.out.println(0);
             System.out.println(0);
-            return;
         }
-
-        List<Integer> path = new ArrayList<Integer>();
+        
+        List<Integer> path = new ArrayList<>();
 
         int cur = destCity;
 
-        while(cur != startCity){
+        while(cur != -1){
             path.add(cur);
             cur = prev[cur];
             if(cur == startCity) break;
         }
 
         Collections.reverse(path);
-        
+
         System.out.println(dist[destCity]);
-        System.out.println(path.size()+1);
+        System.out.println(path.size() + 1);
 
         System.out.print(startCity + " ");
-        for(int i=0; i<path.size(); i++){            
-            System.out.print(path.get(i) + " ");
+        for(int city : path){
+            System.out.print(city + " ");
         }
     }
 }
