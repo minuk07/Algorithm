@@ -29,7 +29,7 @@ class Main {
         boolean[][][] visited = new boolean[n][n][4];
 
         for(int i=0; i<4; i++){
-            visited[y][x][i] = true;
+            //visited[y][x][i] = true;
 
             int ddy = y + dy[i];
             int ddx = x + dx[i];
