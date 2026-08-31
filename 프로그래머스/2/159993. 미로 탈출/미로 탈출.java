@@ -1,90 +1,80 @@
 import java.util.*;
 
 class Solution {
-    static int[] dy = {-1, 1, 0, 0};
-    static int[] dx = {0, 0, -1, 1};
     
-    static char[][] map;
-    static int cnt;
-    static int[][] dist;
+    static int[] dy = {0, 1, 0, -1};
+    static int[] dx = {1, 0, -1, 0};
     
-    static int sy, sx;
-    static int ey, ex;
-    static int ly, lx;
+    static int sy, sx, ey, ex, ly, lx;
+    static int[][] map;
     
-    static class Node{
-        int r,c;
-        Node(int r, int c){
-            this.r = r; this.c = c;
-        }
+    static int n, m;
+    
+    static boolean inRange(int y, int x){
+        return (y>=0 && x>=0 && y<n && x<m);
     }
     
-    static boolean inRange(int y, int x, char[][] map){
-        return (y>=0 && x>=0 && y<map.length && x<map[0].length);
-    }
-    
-    public int solution(String[] maps) {
-        int answer = 0;
+    static int bfs(int y, int x){
+        Queue<int[]> q = new LinkedList<>();
+        boolean[][][] visited = new boolean[n][m][2];
         
-        map = new char[maps.length][maps[0].length()];
-        
-        for(int i=0; i<maps.length; i++){
-            for(int j=0; j<maps[i].length(); j++){
-                map[i][j] = maps[i].charAt(j);
-                if(map[i][j] == 'S'){
-                    sy = i; sx = j;
-                }
-                else if(map[i][j] == 'E'){
-                    ey = i; ex = j;
-                }
-                else if(map[i][j] == 'L'){
-                    ly = i; lx = j;
-                }
-            }
-        }
-        
-        dist = new int[map.length][map[0].length];
-        bfs(sy, sx, map);
-        answer += dist[ly][lx];
-        
-        if(dist[ly][lx] == 0) return -1;
-        
-        dist = new int[map.length][map[0].length];
-        bfs(ly, lx, map);
-        answer += dist[ey][ex];
-        
-        if(dist[ey][ex] == 0) return -1;
-        
-                
-        return answer;
-    }
-    
-    static void bfs(int y, int x, char[][] map){
-        Queue<Node> q = new LinkedList<>();
-        boolean[][] visited = new boolean[map.length][map[0].length];
-
-        
-        q.add(new Node(y, x));
-        visited[y][x] = true;
-        dist[y][x] = 0;
+        visited[y][x][0] = true;
+        q.add(new int[]{y, x, 0, 0});
         
         while(!q.isEmpty()){
-            Node cur = q.poll();
-            int cy = cur.r;
-            int cx = cur.c;
+            int[] cur = q.poll();
+            
+            if(map[cur[0]][cur[1]] == 2 && cur[2] == 1){
+                return cur[3];
+            }
             
             for(int i=0; i<4; i++){
-                int ddy = cy + dy[i];
-                int ddx = cx + dx[i];
+                int ny = cur[0] + dy[i];
+                int nx = cur[1] + dx[i];
                 
-                if(!inRange(ddy, ddx, map)) continue;
-                if(map[ddy][ddx] == 'X') continue;
-                if(visited[ddy][ddx]) continue;
+                if(!inRange(ny, nx)) continue;
+                if(visited[ny][nx][cur[2]]) continue;
+                if(map[ny][nx] == -1) continue;
                 
-                q.add(new Node(ddy, ddx));
-                visited[ddy][ddx] = true;
-                dist[ddy][ddx] = dist[cy][cx] + 1;
+                if(map[ny][nx] == 3 && cur[2] == 0){
+                    visited[ny][nx][1] = true;
+                    q.add(new int[]{ny, nx, 1, cur[3] + 1});
+                }else{
+                    visited[ny][nx][cur[2]] = true;
+                    q.add(new int[]{ny, nx, cur[2], cur[3] + 1});
+                }
             }
         }
+        
+        return -1;
+    }
+    
+    public int solution(String[] maps){
+        
+        n = maps.length;
+        m = maps[0].length();
+        
+        map = new int[n][m];
+        
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(maps[i].charAt(j) == 'S'){
+                    sy = i; sx = j;
+                    map[i][j] = 1;
+                }else if(maps[i].charAt(j) == 'E'){
+                    ey = i; ex = j;
+                    map[i][j] = 2;
+                }else if(maps[i].charAt(j) == 'L'){
+                    ly = i; lx = j;
+                    map[i][j] = 3;
+                }else if(maps[i].charAt(j) == 'O'){
+                    map[i][j] = 0;
+                }else{
+                    map[i][j] = -1;
+                }
+            }
+        }
+        
+        return bfs(sy, sx);
     }
 }
