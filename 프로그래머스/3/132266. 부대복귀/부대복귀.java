@@ -2,53 +2,58 @@ import java.util.*;
 
 class Solution {
     
-    static List<List<Integer>> graph;
-    static int[] time;
+    static int n;
+    static List<Integer>[] graph;
     
-    static void bfs(int start, int n){
-        Queue<Integer> q = new LinkedList<>();
+    static int bfs(int start, int dest){
         boolean[] visited = new boolean[n+1];
+        Queue<int[]> q = new LinkedList<>();
         
+        q.add(new int[]{start, 0});
         visited[start] = true;
-        q.add(start);
         
         while(!q.isEmpty()){
-            int cur = q.poll();
+            int[] cur = q.poll();
             
-            for(int i=0; i<graph.get(cur).size(); i++){
-                int ad = graph.get(cur).get(i);
-                if(visited[ad]) continue;
-                q.add(ad);
-                visited[ad] = true;
-                time[ad] = time[cur] + 1;
+            if(cur[0] == dest){
+                return cur[1];
+            }
+            
+            for(int adj : graph[cur[0]]){
+                if(visited[adj]) continue;
+                q.add(new int[]{adj, cur[1] + 1});
+                visited[adj] = true;
             }
         }
         
+        return -1;
     }
     
     public int[] solution(int n, int[][] roads, int[] sources, int destination) {
-        int[] answer = new int[sources.length];
+        List<Integer> result = new ArrayList<>();
         
-        graph = new ArrayList<>();
+        this.n = n;
+        graph = new ArrayList[n+1];
         
-        for(int i=0; i<n+1; i++){
-            graph.add(new ArrayList<>());
+        for(int i=0; i<=n; i++){
+            graph[i] = new ArrayList<>();
         }
         
         for(int[] road : roads){
-            int a = road[0]; int b = road[1];
-            graph.get(a).add(b);
-            graph.get(b).add(a);
+            int a = road[0];
+            int b = road[1];
+            
+            graph[a].add(b);
+            graph[b].add(a);
         }
         
-        time = new int[n+1];
-        bfs(destination, n);
+        for(int source : sources){
+            result.add(bfs(source, destination));
+        }
         
-        for(int i=0; i<sources.length; i++){
-            
-            if(destination == sources[i]) answer[i] = 0;
-            else if(time[sources[i]] == 0) answer[i] = -1;
-            else answer[i] = time[sources[i]];
+        int[] answer = new int[sources.length];
+        for(int i=0; i<answer.length; i++){
+            answer[i] = result.get(i);
         }
         
         return answer;
