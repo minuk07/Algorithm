@@ -1,14 +1,15 @@
 class Solution {
     
-    static boolean canGo(int[] stones, int k, int num){
+    static boolean canGo(int num, int[] stones, int k){
+        
         int cnt = 0;
         
         for(int stone : stones){
-            if(stone - num < 0){
+            
+            if(stone - num <= 0){
                 cnt++;
                 if(cnt >= k) return false;
-            }
-            else{
+            }else{
                 cnt = 0;
             }
         }
@@ -19,21 +20,19 @@ class Solution {
     public int solution(int[] stones, int k) {
         int answer = 0;
         
-        int max = 200000000;
-        int min = 1;
+        int left = 1; 
+        int right = 200_000_000;
         
-        while(min <= max){
-            int mid = (max + min) / 2;
+        while(left < right){
+            int mid = left + (right - left) / 2;
             
-            if(canGo(stones, k, mid)){
-                answer = mid;
-                min = mid + 1;
-            }
-            else{
-                max = mid - 1;
+            if(canGo(mid, stones, k)){
+                left = mid + 1;
+            }else{
+                right = mid;
             }
         }
         
-        return answer;
+        return left;
     }
 }
