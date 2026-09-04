@@ -4,71 +4,75 @@ class Solution {
     
     static Map<String, Integer> map;
     
+    static void dfs(int start, int len, int target, String now, String order){
+        
+        if(len == target){
+            map.put(now, map.getOrDefault(now, 0) + 1);
+            return;
+        }
+        
+        for(int i=start; i<order.length(); i++){
+            dfs(i+1, len+1, target, now + order.charAt(i), order);
+        }
+        
+        return;
+    }
+    
+    static String sortOrder(String order){
+        String answer = "";
+        
+        char[] tmp = new char[order.length()];
+        
+        for(int i=0; i<order.length(); i++){
+            tmp[i] = order.charAt(i);
+        }
+        
+        Arrays.sort(tmp);
+        
+        for(char c : tmp){
+            answer += c;
+        }
+        
+        return answer;
+    }
+    
     public String[] solution(String[] orders, int[] course) {
         List<String> list = new ArrayList<>();
         
-        for(int len : course){
-            
-            map = new HashMap<>();
+        map = new HashMap<>();
+        
+        
+        for(int c : course){
             
             for(String order : orders){
-                String sorted = sortOrder(order);
-                
-                dfs(0, len, "", sorted);
+                String sortedOrder = sortOrder(order);
+                dfs(0, 0, c, "", sortedOrder);
             }
+        }
+        
+        for(int c :course){
             
-            int max = 0;
+            int maxSize = 0;
             
-            for(int value : map.values()){
-                max = Math.max(max, value);
+            for(String key : map.keySet()){
+                if(key.length() == c){
+                    maxSize = Integer.max(maxSize, map.get(key));
+                }
             }
             
             for(String key : map.keySet()){
-                int value = map.get(key);
-                
-                if(value >= 2 && max <= value){
+                if(key.length() == c && map.get(key) == maxSize && map.get(key) >= 2){
                     list.add(key);
                 }
             }
         }
         
+        Collections.sort(list);
+        
         String[] answer = new String[list.size()];
         
         for(int i=0; i<answer.length; i++){
             answer[i] = list.get(i);
-        }
-        
-        Arrays.sort(answer);
-        
-        return answer;
-    }
-    
-    static void dfs(int idx, int len, String answer , String order){
-        
-        if(len == answer.length()){
-            map.put(answer, map.getOrDefault(answer, 0) + 1);
-            return;
-        }
-        
-        for(int i=idx; i<order.length(); i++){
-            dfs(i+1, len, answer + order.charAt(i) ,order);
-        }
-        
-    }
-    
-    static String sortOrder(String order){
-        char[] arr = new char[order.length()];
-        
-        for(int i=0; i<order.length(); i++){
-            arr[i] = order.charAt(i);
-        }
-        
-        Arrays.sort(arr);
-        
-        String answer = "";
-        
-        for(int i=0; i<arr.length; i++){
-            answer += arr[i];
         }
         
         return answer;
