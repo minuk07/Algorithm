@@ -1,40 +1,35 @@
-import java.util.*;
-
 class Solution {
     
-    static boolean isPossible(int n, int[] times, long time){
-        
-        long sum = 0;
+    static boolean canTake(long time, int n, int[] times){
+        long cnt = 0;
         
         for(int t : times){
-            sum += (time / t);
+            cnt += (time / t);
         }
         
-        if(sum >= n) return true;
-        else return false;
+        if(cnt >= n){
+            return true;
+        }else{
+            return false;
+        }
     }
     
     public long solution(int n, int[] times) {
-        long answer = 0;
+    
+        long left = 0;
+        long right = 1_000_000_000L * 1_000_000_000L;
         
-        Arrays.sort(times);
-        
-        long min = 0;
-        long max = (long) n * times[times.length - 1];
-        
-        while(min <= max){
-            long mid = (min + max) / 2;
+        while(left < right){
+            long mid = left + (right - left) / 2;
+            //System.out.println(mid);
             
-            if(isPossible(n, times, mid)){
-                answer = mid;
-                max = mid - 1;
-            }
-            else{
-                min = mid + 1;
+            if(canTake(mid, n, times)){
+                right = mid;
+            }else{
+                left = mid + 1;
             }
         }
         
-        
-        return answer;
+        return left;
     }
 }
