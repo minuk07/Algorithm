@@ -2,16 +2,48 @@ import java.util.*;
 
 class Solution {
     
-    static int[] dy = {-1, 1, 0, 0};
-    static int[] dx = {0, 0, 1, -1};
+    static int[] dy = {0, 0, 1, -1};
+    static int[] dx = {1, -1, 0, 0};
     
-    static int[][] map;
-    static boolean[][] visited;
-    static List<Integer> list;
     static int n, m;
+    static int[][] map;
+    
+    static List<Integer> list;
+    static boolean[][] visited;
     
     static boolean inRange(int y, int x){
         return (y>=0 && x>=0 && y<n && x<m);
+    }
+    
+    static void bfs(int y, int x){
+        
+        Queue<int[]> q = new LinkedList<>();
+        
+        int cnt = map[y][x];
+        
+        q.add(new int[]{y, x});
+        visited[y][x] = true;
+        
+        while(!q.isEmpty()){
+            int[] cur = q.poll();
+            
+            int cy = cur[0]; int cx = cur[1];
+            
+            for(int i=0; i<4; i++){
+                int ny = cy + dy[i];
+                int nx = cx + dx[i];
+                
+                if(!inRange(ny, nx)) continue;
+                if(map[ny][nx] == -1) continue;
+                if(visited[ny][nx]) continue;
+                
+                visited[ny][nx] = true;
+                q.add(new int[]{ny, nx});
+                cnt += map[ny][nx];
+            }
+        }
+        
+        list.add(cnt);
     }
     
     public int[] solution(String[] maps) {
@@ -19,68 +51,41 @@ class Solution {
         n = maps.length;
         m = maps[0].length();
         
+        list = new ArrayList<>();
         map = new int[n][m];
         visited = new boolean[n][m];
-        list = new ArrayList<>();
         
         for(int i=0; i<n; i++){
-            String str = maps[i];
             for(int j=0; j<m; j++){
-                if(str.charAt(j) == 'X'){
-                    map[i][j] = 0;
-                }
-                else{
-                    map[i][j] = str.charAt(j) - '0';
+                char tmp = maps[i].charAt(j);
+                
+                if(tmp == 'X'){
+                    map[i][j] = -1;
+                }else{
+                    map[i][j] = tmp - '0';
                 }
             }
         }
         
         for(int i=0; i<n; i++){
             for(int j=0; j<m; j++){
-                if(map[i][j] != 0 && !visited[i][j]){
-                    list.add(bfs(i,j));
+                if(!visited[i][j] && map[i][j] > 0){
+                    bfs(i, j);
                 }
             }
         }
         
         if(list.isEmpty()){
-            return new int[]{-1};
+            list.add(-1);
         }
         
-        Collections.sort(list);
-        
-        int[] result = new int[list.size()];
-        
+        int[] answer = new int[list.size()];
         for(int i=0; i<list.size(); i++){
-            result[i] = list.get(i);
+            answer[i] = list.get(i);
         }
         
-        return result;
-    }
-    
-    static int bfs(int y, int x){
-        int cnt = map[y][x];
-        Queue<int[]> q = new LinkedList<>();
-        visited[y][x] = true;
-        q.add(new int[]{y, x});
+        Arrays.sort(answer);
         
-        while(!q.isEmpty()){
-            int[] cur = q.poll();
-            
-            for(int i=0; i<4; i++){
-                int ddy = cur[0] + dy[i];
-                int ddx = cur[1] + dx[i];
-                
-                if(!inRange(ddy, ddx)) continue;
-                if(map[ddy][ddx] == 0) continue;
-                if(visited[ddy][ddx]) continue;
-                
-                cnt += map[ddy][ddx];
-                visited[ddy][ddx] = true;
-                q.add(new int[]{ddy, ddx});
-            }
-        }
-        
-        return cnt;
+        return answer;
     }
 }
