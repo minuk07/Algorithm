@@ -2,87 +2,84 @@ import java.util.*;
 
 class Solution {
     
-    static class Task{
-        private String name;
-        private int start;
-        private int time;
+    static List<String> list;
+    static int n;
+    
+    class Work{
+        String name;
+        int start, take;
         
-        public Task(String name, int start, int time){
-            this.name = name; this.start = start; this.time = time;
+        Work(String name, int start, int take){
+            this.name = name; this.start = start; this.take = take;
         }
     }
     
     public String[] solution(String[][] plans) {
         
-        List<String> list = new LinkedList<>();
-        PriorityQueue<Task> pq = new PriorityQueue<>(
-            (a,b) -> (a.start - b.start)
-        );
+        list = new ArrayList<>();
+        n = plans.length;
         
-        for(int i=0; i<plans.length; i++){
-            String name = plans[i][0];
-            String[] str = plans[i][1].split(":");
+        List<Work> plan = new ArrayList<>();
+        
+        for(String[] p : plans){
+            String name = p[0];
+            String[] tmp = p[1].split(":");
+            int hour = Integer.parseInt(tmp[0]) * 60;
+            int minute = Integer.parseInt(tmp[1]);
             
-            int hour = Integer.parseInt(str[0]);
-            int minute = Integer.parseInt(str[1]);
-            
-            int start = hour*60 + minute;
-            int time = Integer.parseInt(plans[i][2]);
-            
-            pq.add(new Task(name, start, time));
+            int start = hour + minute;
+            int take = Integer.parseInt(p[2]);
+                        
+            plan.add(new Work(name, start, take));
         }
         
-        Stack<Task> st = new Stack<>();
+        Collections.sort(plan, (a,b) -> a.start - b.start);
         
-        while(!pq.isEmpty()){
-            Task cur = pq.poll();
+        Stack<Work> stack = new Stack<>();
+        
+        
+        for(int i=0; i<n-1; i++){
             
-            String curName = cur.name;
-            int curTime = cur.start;
-            int curPlaytime = cur.time;
+            Work cur = plan.get(i);
+            Work next = plan.get(i+1);
             
-            Task next = pq.peek();
+            int finish = cur.start + cur.take;
             
-            if(next == null){
-                st.push(cur);
-                break;
-            }
-            
-            if(curTime + curPlaytime < next.start){
-                curTime += curPlaytime;
-                list.add(curName);
+            if(finish <= next.start){ //빨리 끝나는 경우
+                list.add(cur.name);
                 
-                while(!st.isEmpty()){
-                    Task t = st.pop();
+                int time = next.start - finish;
+                
+                while(time > 0 && !stack.isEmpty()){
                     
-                    if(curTime + t.time <= next.start){
-                        curTime += t.time;
-                        list.add(t.name);
-                    }
-                    else{
-                        st.push(new Task(t.name, next.start, t.time - (next.start - curTime)));
-                        break;
+                    Work recent = stack.pop();
+                
+                    if(recent.take <= time){
+                        list.add(recent.name);
+                        time -= recent.take;
+                    } else{
+                        recent.take -= time;
+                        stack.push(recent);
+                        time = 0;
                     }
                 }
-            }
-            else if(curTime + curPlaytime == next.start){
-                list.add(curName);
-            }
-            else{
-                st.push(new Task(curName, next.start, curPlaytime - (next.start - curTime)));
-            }
-        }
-        
-        if(!st.isEmpty()){
-            while(!st.isEmpty()){
-                Task t = st.pop();
-                list.add(t.name);
+            }else{
+                
+                int remain = finish - next.start;
+                
+                stack.push(new Work(cur.name, next.start, remain));
             }
         }
         
-        String[] answer = new String[list.size()];
+        list.add(plan.get(n-1).name);
         
-        for(int i=0; i<answer.length; i++){
+        while(!stack.isEmpty()){
+            list.add(stack.pop().name);
+        }
+        
+        String[] answer = new String[n];
+        
+        for(int i=0; i<n; i++){
             answer[i] = list.get(i);
         }
         
