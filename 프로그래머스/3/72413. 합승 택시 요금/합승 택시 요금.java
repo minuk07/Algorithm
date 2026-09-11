@@ -2,44 +2,78 @@ import java.util.*;
 
 class Solution {
     
-    static final int INF = 100_000_000;
+    static final int INF = Integer.MAX_VALUE;
     
-    public int solution(int n, int s, int a, int b, int[][] fares) {
-        int answer = Integer.MAX_VALUE;
+    static List<Node>[] graph;
+    static int n;
+    
+    static class Node{
+        int dest, cost;
         
-        int[][] dist = new int[n+1][n+1];
-    
-        for(int i=1; i<=n; i++){
-            Arrays.fill(dist[i], INF);
-            dist[i][i] = 0;
+        Node(int dest, int cost){
+            this.dest = dest; this.cost = cost;
         }
+    }
+    
+    static int[] dijkstra(int start){
+        boolean[] visited = new boolean[n+1];
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, INF);
         
-        for(int[] f : fares){
-            int node1 = f[0];
-            int node2 = f[1];
-            int cost = f[2];
+        PriorityQueue<Node> pq = new PriorityQueue<>((a,b) -> a.cost - b.cost);
+        
+        pq.add(new Node(start, 0));
+        dist[start] = 0;
+        
+        while(!pq.isEmpty()){
+            Node cur = pq.poll();
+            visited[cur.dest] = true;
             
-            dist[node1][node2] = cost;
-            dist[node2][node1] = cost;
-        }
-        
-        for(int k=1; k<=n; k++){
-            for(int i=1; i<=n; i++){
-                for(int j=1; j<=n; j++){
-                    dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+            for(Node adj : graph[cur.dest]){
+                
+                if(visited[adj.dest]) continue;
+                
+                if(dist[adj.dest] > dist[cur.dest] + adj.cost){
+                    dist[adj.dest] = dist[cur.dest] + adj.cost;
+                    pq.add(new Node(adj.dest, dist[adj.dest]));
                 }
             }
         }
         
-        int[] share = new int[n+1];
+        return dist;
+    }
+    
+    public int solution(int n, int s, int a, int b, int[][] fares) {
+        int answer = INF;
+        this.n = n;
         
-        for(int i=1; i<=n; i++){
-            share[i] = dist[s][i] + dist[i][a] + dist[i][b];
+        graph = new ArrayList[n+1];
+        
+        for(int i=0; i<=n; i++){
+            graph[i] = new ArrayList<>();
         }
         
-        for(int i=1; i<=n; i++){
-            answer = Math.min(answer, share[i]);
+        for(int[] fare : fares){
+            int a1 = fare[0];
+            int a2 = fare[1];
+            int c = fare[2];
+            graph[a1].add(new Node(a2, c));
+            graph[a2].add(new Node(a1, c));
         }
+        
+        int[] distS = dijkstra(s);
+        int[] distA = dijkstra(a);
+        int[] distB = dijkstra(b);
+        
+        for(int i=1; i<=n; i++){
+            int tmp = 0;
+            tmp += distS[i];
+            tmp += distA[i];
+            tmp += distB[i];
+            
+            answer = Math.min(answer, tmp);
+        }
+        
         
         
         return answer;
