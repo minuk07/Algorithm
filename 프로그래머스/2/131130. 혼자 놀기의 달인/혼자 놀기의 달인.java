@@ -3,38 +3,47 @@ import java.util.*;
 class Solution {
     
     static boolean[] visited;
+    static int n;
     static int[] cards;
-    static List<Integer> list;
     
-    static int dfs(int size, int idx){
-        if(visited[idx-1]) return size - 1;
+    static List<List<Integer>> result;
+    static List<Integer> tmp;
+    
+    static void dfs(int idx, List<Integer> list){
+        if(visited[idx]){
+            result.add(new ArrayList<>(list));
+            return;
+        }
         
-        visited[idx-1] = true;
-        return dfs(size+1, cards[idx-1]);
+        list.add(cards[idx]);
+        visited[idx] = true;
+        dfs(cards[idx]-1, list);
     }
     
     public int solution(int[] cards) {
         int answer = 0;
         
-        int n = cards.length;
         this.cards = cards;
+        n = cards.length;
         visited = new boolean[n];
-        list = new ArrayList<>();
         
-        for(int i=1; i<=n; i++){
-            if(visited[i-1]) continue;
-            
-            list.add(dfs(1, i));
+        result = new ArrayList<>();
+        
+        for(int i=0; i<n; i++){
+            if(!visited[i]){
+                visited[i] = true;
+                tmp = new ArrayList<>();
+                tmp.add(cards[i]);
+                dfs(cards[i] - 1, tmp);
+            }
         }
         
-        Collections.sort(list, Collections.reverseOrder());
+        Collections.sort(result, (a,b) -> b.size() - a.size());
         
-        if(list.size() <= 1){
-            answer = 0;
-        }else{
-            answer = list.get(0) * list.get(1);
+        if(result.size() < 2){
+            return 0;
         }
         
-        return answer;
+        return result.get(0).size() * result.get(1).size();
     }
 }
