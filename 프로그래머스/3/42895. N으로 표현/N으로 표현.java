@@ -2,21 +2,22 @@ import java.util.*;
 
 class Solution {
     public int solution(int N, int number) {
+        int answer = -1;
         
-        List<Set<Integer>> list = new ArrayList<>();
+        List<Set<Integer>> result = new ArrayList<>();
         
-        for(int i=0; i<9; i++){
-            list.add(new HashSet<>());
+        for(int i=0; i<=8; i++){
+            result.add(new HashSet<>());
         }
         
-        list.get(1).add(N);
+        result.get(1).add(N);
         
-        for(int i=2; i<9; i++){
-            Set<Integer> cur = list.get(i);
+        for(int i=2; i<=8; i++){
+            Set<Integer> cur = result.get(i);
             
-            for(int j=1; j<=i; j++){
-                Set<Integer> set1 = list.get(j);
-                Set<Integer> set2 = list.get(i-j);
+            for(int j=1; j<i; j++){
+                Set<Integer> set1 = result.get(j);
+                Set<Integer> set2 = result.get(i-j);
                 
                 for(int s1 : set1){
                     for(int s2 : set2){
@@ -25,26 +26,28 @@ class Solution {
                         cur.add(s1 * s2);
                         
                         if(s1 != 0 && s2 != 0){
-                            cur.add(s1 / s2);
+                            if(s1 % s2 == 0){
+                                cur.add(s1 / s2);
+                            }
                         }
                     }
                 }
             }
             
-            int temp = N;
+            int tmp = N;
             for(int j=1; j<i; j++){
-                temp = temp * 10;
-                temp += N;
+                tmp *= 10;
+                tmp += N;
             }
-            cur.add(temp);
+            cur.add(tmp);
         }
         
-        for(int i=1; i<9; i++){
-            if(list.get(i).contains(number)){
+        for(int i=1; i<=8; i++){
+            if(result.get(i).contains(number)){
                 return i;
             }
         }
         
-        return -1;
+        return answer;
     }
 }
