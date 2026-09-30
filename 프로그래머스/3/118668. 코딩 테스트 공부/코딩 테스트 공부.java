@@ -55,13 +55,6 @@ class Solution {
             }
         }
         
-        // for(int i=0; i<=max_alp; i++){
-        //     for(int j=0; j<=max_cop; j++){
-        //         System.out.print(dp[i][j] + " ");
-        //     }
-        //     System.out.println();
-        // }
-        
         return dp[max_alp][max_cop];
     }
 }
