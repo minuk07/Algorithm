@@ -30,7 +30,7 @@ class Solution {
         return true;
     }
     
-    private void dfs(int order, String result, Map<Character, Integer> ordered){
+    private void dfs(int order, Map<Character, Integer> ordered){
         if(order == 9){
             if(canOrder(ordered)) answer++;
             return;
@@ -40,7 +40,7 @@ class Solution {
             if(!visited[i]){
                 visited[i] = true;
                 ordered.put(friends[i], order);
-                dfs(order+1, result + friends[i], ordered);
+                dfs(order+1, ordered);
                 ordered.remove(friends[i]);
                 visited[i] = false;
             }
@@ -54,7 +54,7 @@ class Solution {
         Map<Character, Integer> ordered = new HashMap<>();
         visited = new boolean[8];
         
-        dfs(1, "", ordered);
+        dfs(1, ordered);
         
         return answer;
     }
