@@ -1,54 +1,64 @@
 import java.util.*;
 
 class Solution {
-    public static int answer;
-    public static boolean visited[];
-    public static int graph[][];
     
-    public int solution(int n, int[][] wires) {
-        answer = Integer.MAX_VALUE;
-        
-        graph = new int[n+1][n+1];
-        
-        for(int i=0; i<wires.length; i++){
-            graph[wires[i][0]][wires[i][1]] = 1;
-            graph[wires[i][1]][wires[i][0]] = 1;
-        }
-        
-        for(int i=0; i<wires.length; i++){
-            
-            visited = new boolean[n+1];
-            
-            graph[wires[i][1]][wires[i][0]] = 0;
-            graph[wires[i][0]][wires[i][1]] = 0;
-            
-            int[] arr = new int[2];
-            int t = 0;
-            int first = dfs(1, graph);
-            int second = n - first;
-            
-            answer = Math.min(answer, Math.abs(first-second));
-            
-            //System.out.println(i + "번째: a=" + first +" b="+second +"answer="+answer);
-            
-            graph[wires[i][0]][wires[i][1]] = 1;
-            graph[wires[i][1]][wires[i][0]] = 1;
-        }
-        
-        return answer;
-    }
+    List<Integer>[] graph;
     
-    public int dfs(int x, int[][] graph){
+    private int bfs(int n, int start){
         
-        int con = 1;
+        int cnt = 1;
         
-        visited[x] = true;
-        for(int i=1; i<graph.length; i++){
-            if(graph[x][i] == 1 && !visited[i]){
-                con += dfs(i, graph);
+        boolean[] visited = new boolean[n+1];
+        Queue<Integer> q = new LinkedList<>();
+        visited[start] = true;
+        q.add(start);
+        
+        while(!q.isEmpty()){
+            int cur = q.poll();
+            
+            for(int adj : graph[cur]){
+                if(visited[adj]) continue;
+                visited[adj] = true;
+                cnt++;
+                q.add(adj);
             }
         }
         
-        return con;
+        return cnt;
+    }
+    
+    public int solution(int n, int[][] wires) {
+        int answer = Integer.MAX_VALUE;
+        
+        graph = new ArrayList[n+1];
+        
+        for(int i=1; i<=n; i++){
+            graph[i] = new ArrayList<>();
+        }
+        
+        for(int[] wire : wires){
+            int a = wire[0];
+            int b = wire[1];
+            
+            graph[a].add(b);
+            graph[b].add(a);
+        }
+        
+        for(int[] wire : wires){
+            int a = wire[0];
+            int b = wire[1];
+            
+            graph[a].remove(Integer.valueOf(b));
+            graph[b].remove(Integer.valueOf(a));
+            
+            int cnt = bfs(n, a);
+            
+            answer = Math.min(answer, Math.abs((n-cnt) -  cnt));
+            
+            graph[a].add(b);
+            graph[b].add(a);
+        }
+        
+        return answer;
     }
 }
