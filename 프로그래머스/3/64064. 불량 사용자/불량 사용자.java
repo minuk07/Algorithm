@@ -21,9 +21,9 @@ class Solution {
         return true;
     }
 
-    private void dfs(int idx, Set<String> set, String[] banned_id){
+    private void dfs(int idx, List<String> list, String[] banned_id){
         if(idx == banned_id.length){
-            List<String> sorted = new ArrayList<>(set);
+            List<String> sorted = new ArrayList<>(list);
             Collections.sort(sorted);
             
             StringBuilder tmp = new StringBuilder();
@@ -37,11 +37,11 @@ class Solution {
         }
         
         for(String user : candidate.get(idx)){
-            if(set.contains(user)) continue;
+            if(list.contains(user)) continue;
             
-            set.add(user);
-            dfs(idx+1, set, banned_id);
-            set.remove(user);
+            list.add(user);
+            dfs(idx+1, list, banned_id);
+            list.remove(user);
         }
     }
     
@@ -64,7 +64,7 @@ class Solution {
         }
         
         result = new HashSet<>();
-        dfs(0, new HashSet<>(), banned_id);
+        dfs(0, new ArrayList<>(), banned_id);
         
         return result.size();
     }
