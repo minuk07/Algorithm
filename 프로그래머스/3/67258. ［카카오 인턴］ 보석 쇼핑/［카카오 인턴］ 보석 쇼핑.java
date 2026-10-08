@@ -1,43 +1,39 @@
 import java.util.*;
 
 class Solution {
+    
+    Map<String, Integer> map;
+    Set<String> set;
+    
     public int[] solution(String[] gems) {
-        int[] answer = new int[2];
         
-        HashSet<String> hash = new HashSet<>();
-        for(String s : gems){
-            hash.add(s);
+        map = new HashMap<>();
+        set = new HashSet<>();
+        
+        for(String gem : gems){
+            set.add(gem);
         }
-        int size = hash.size();
         
-        int left = 0; int right = 0;
-        int result = Integer.MAX_VALUE;
-        int start = 0;
+        int bestL = 0;
+        int bestR = Integer.MAX_VALUE;
+        int left = 0;
         
-        HashMap<String, Integer> map = new HashMap<>();
-        
-        while(right < gems.length){
-            
+        for(int right=0; right<gems.length; right++){
             map.put(gems[right], map.getOrDefault(gems[right], 0) + 1);
-            right++;
             
-            while(map.size() == size){
-                if(result > right - left){
-                    start = left;
-                    result = right - left;
-                }
+            while(map.get(gems[left]) > 1){
                 map.put(gems[left], map.get(gems[left]) - 1);
-                if(map.get(gems[left]) == 0){
-                    map.remove(gems[left]);
-                }
                 left++;
             }
+            
+            if(map.size() == set.size() && bestR-bestL > right-left){
+                bestR = right;
+                bestL = left;
+            }
+            
         }
         
-        //System.out.println(result);
         
-        answer[0] = start + 1;
-        answer[1] = start + result;
-        return answer;
+        return new int[]{bestL+1, bestR+1};
     }
 }
