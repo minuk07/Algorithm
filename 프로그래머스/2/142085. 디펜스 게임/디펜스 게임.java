@@ -2,35 +2,25 @@ import java.util.*;
 
 class Solution {
     public int solution(int n, int k, int[] enemy) {
-        int answer = 0;
         
-        PriorityQueue<Integer> pq = new PriorityQueue<>((a,b) -> b - a);
-        
+        PriorityQueue<Integer> pq = new PriorityQueue<>((a,b) -> b-a);
         int sum = 0;
         
-        for(int round = 0; round<enemy.length; round++){
-            int cur = enemy[round];
-            
-            pq.add(cur);
-            sum += cur;
-            
-            if(sum > n && k > 0){
-                k--;
-                sum -= pq.poll();
-            }
+        for(int i=0; i<enemy.length; i++){
+            int e = enemy[i];
+            sum += e;
+            pq.add(e);
             
             if(sum > n){
-                answer = round;
-                break;
+                if(k > 0){
+                    sum -= pq.poll();
+                    k--;
+                }else{
+                    return i;
+                }
             }
-            
-            if(round == enemy.length - 1){
-                answer = enemy.length;
-            }
-            
-            
         }
         
-        return answer;
+        return enemy.length;
     }
 }
