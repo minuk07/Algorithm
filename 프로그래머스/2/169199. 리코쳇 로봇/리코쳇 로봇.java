@@ -2,97 +2,73 @@ import java.util.*;
 
 class Solution {
     
-    static int[] dy = {-1, 1, 0, 0};
-    static int[] dx = {0, 0, -1, 1};
+    int[] dy = {0, 0, -1, 1};
+    int[] dx = {1, -1, 0, 0};
     
-    static int answer;
+    int n, m;
+    String[] board;
     
-    static int n, m;
-    static int[][] map;
-    static int startY, startX;
-    static int destY, destX;
-    
-    static class Robot{
+    class Robot{
         int r, c, cnt;
-        
-        Robot(int r, int c,int cnt){
-            this.r = r; this.c = c; this.cnt = cnt;
+        Robot(int r, int c, int cnt){
+            this.r=r; this.c=c; this.cnt=cnt;
         }
     }
     
-    static boolean inRange(int y, int x){
-        return (y>=0 && x>=0 && y<n && x<m);
+    private boolean inRange(int y, int x){
+        return(y>=0 && x>=0 && y<n && x<m);
     }
     
-    static void bfs(Robot robot){
-        
+    private int bfs(Robot start){
         boolean[][] visited = new boolean[n][m];
         Queue<Robot> q = new LinkedList<>();
-        q.add(robot);
-        visited[robot.r][robot.c] = true;
+        visited[start.r][start.c] = true;
+        q.add(start);
         
         while(!q.isEmpty()){
             Robot cur = q.poll();
-            
-            int y = cur.r; int x = cur.c; int cnt = cur.cnt;
-            
-            if(y == destY && x == destX){
-                answer = cnt;
-                break;
+            if(board[cur.r].charAt(cur.c) == 'G'){
+                return cur.cnt;
             }
             
             for(int i=0; i<4; i++){
-            
-                int ny = y + dy[i];
-                int nx = x + dx[i];
-
-                while(inRange(ny, nx) && map[ny][nx] == 0){
+                int ny = cur.r + dy[i];
+                int nx = cur.c + dx[i];
+                
+                while(inRange(ny, nx) && board[ny].charAt(nx) != 'D'){
                     ny += dy[i];
                     nx += dx[i];
                 }
-
+                
                 ny -= dy[i];
                 nx -= dx[i];
-
-                if(visited[ny][nx]) continue;
-
-                visited[ny][nx] = true;
-                q.add(new Robot(ny, nx, cnt + 1));
-            }
-        }
-        
-        
-        
-        return;
-    }
-    
-    public int solution(String[] board) {
-        answer = 0;
-        
-        n = board.length;
-        m = board[0].length();
-        map = new int[n][m];
-        
-        for(int i=0; i<n; i++){
-            for(int j=0; j<m; j++){
-                char tmp = board[i].charAt(j);
                 
-                if(tmp == 'R'){
-                    startY = i; startX = j;
-                }else if(tmp == 'G'){
-                    destY = i; destX = j;
-                }else if(tmp == 'D'){
-                    map[i][j] = -1;
-                }else{
-                    map[i][j] = 0;
+                if(!visited[ny][nx]){
+                    visited[ny][nx] = true;
+                    q.add(new Robot(ny, nx, cur.cnt + 1));
                 }
             }
         }
         
-        bfs(new Robot(startY, startX, 0));
-        
-        if(answer != 0) return answer;
-        
         return -1;
+    }
+    
+    public int solution(String[] board) {
+        int answer = -1;
+        
+        this.board = board;
+        n = board.length;
+        m = board[0].length();
+        
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(board[i].charAt(j) == 'R'){
+                    Robot start = new Robot(i, j, 0);
+                    answer = bfs(start);
+                }
+            }
+        }
+        
+        return answer;
     }
 }
