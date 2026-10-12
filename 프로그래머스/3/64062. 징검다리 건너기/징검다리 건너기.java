@@ -1,12 +1,11 @@
 class Solution {
     
-    static boolean canGo(int num, int[] stones, int k){
+    private boolean canGo(int friends, int[] stones, int k){
         
         int cnt = 0;
         
         for(int stone : stones){
-            
-            if(stone - num <= 0){
+            if(stone - friends <= 0){
                 cnt++;
                 if(cnt >= k) return false;
             }else{
@@ -18,9 +17,8 @@ class Solution {
     }
     
     public int solution(int[] stones, int k) {
-        int answer = 0;
         
-        int left = 1; 
+        int left = 1;
         int right = 200_000_000;
         
         while(left < right){
