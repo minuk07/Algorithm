@@ -2,62 +2,54 @@ import java.util.*;
 
 class Solution {
     
-    static List<Integer>[] graph;
-    static Map<Integer, Integer> map;
+    List<Integer>[] graph;
+    Map<Integer, Integer> map;
+    int max;
+    int n;
     
-    static int n;
-    
-    static class Node{
-        int idx, depth;
-        
-        Node(int idx, int depth){
-            this.idx = idx; this.depth = depth;
-        }
-    }
-    
-    static void bfs(Node start){
+    private void bfs(int start){
+        Queue<int[]> q = new LinkedList<>();
         boolean[] visited = new boolean[n+1];
-        Queue<Node> q = new LinkedList<>();
         
-        q.add(start);
-        visited[start.idx] = true;
+        q.add(new int[]{start, 0});
+        visited[start] = true;
         
         while(!q.isEmpty()){
-            Node cur = q.poll();
+            int[] cur = q.poll();
             
-            for(int adj : graph[cur.idx]){
+            for(int adj : graph[cur[0]]){
                 if(visited[adj]) continue;
-                
-                map.put(cur.depth + 1, map.getOrDefault(cur.depth + 1, 0) + 1);
-                q.add(new Node(adj, cur.depth + 1));
                 visited[adj] = true;
+                map.put(cur[1] + 1, map.getOrDefault(cur[1]+1, 0) + 1);
+                
+                max = Math.max(max, cur[1] + 1);
+                q.add(new int[]{adj, cur[1]+1});
             }
         }
     }
-    
-    public int solution(int n, int[][] edge) {
         
+    public int solution(int n, int[][] edge) {
+        max = 0;
         this.n = n;
         
         graph = new ArrayList[n+1];
-        map = new HashMap<>();
         
         for(int i=0; i<=n; i++){
             graph[i] = new ArrayList<>();
         }
         
         for(int[] e : edge){
-            int a = e[0];
-            int b = e[1];
+            int v1 = e[0];
+            int v2 = e[1];
             
-            graph[a].add(b);
-            graph[b].add(a);
+            graph[v1].add(v2);
+            graph[v2].add(v1);
         }
         
-        Node start = new Node(1, 0);
-        map.put(0, 1);
-        bfs(start);
+        map = new HashMap<>();
         
-        return map.get(map.size() - 1);
+        bfs(1);
+        
+        return map.get(max);
     }
 }
