@@ -1,66 +1,73 @@
 import java.util.*;
 
 class Solution {
-    static int[][] board;
-    static int n;
-
-    static int[][][] cost;   
-
-    static int[] dy = {-1, 1, 0, 0};  // 상 하 좌 우
-    static int[] dx = {0, 0, -1, 1};
     
-    public static boolean inRange(int y, int x){
-        return (y>=0 && x>=0 && y<n && x<n);
+    int[] dy = {-1, 1, 0, 0}; //상 하 좌 우
+    int[] dx = {0, 0, -1, 1};
+    
+    int n;
+    int[][] board;
+    int answer;
+    
+    class Node{
+        int r, c, dir, cost;
+        
+        Node(int r, int c, int dir, int cost){
+            this.r = r; this.c = c; this.dir = dir; this.cost = cost;
+        }
     }
     
-    public static void bfs(int y, int x){
-        Queue<int[]> q = new LinkedList<>();
-
-        for(int d=0; d<4; d++){
-            cost[y][x][d] = 0;
-            q.add(new int[]{y, x, d});
+    private boolean inRange(int y, int x){
+        return(y>=0 && x>=0 && y<n && x<n);
+    }
+    
+    private void bfs(int y, int x){
+        Queue<Node> q = new LinkedList<>();
+        int[][][] visited = new int[n][n][4];
+        
+        for(int i=0; i<n; i++){
+            for(int j=0;j <n; j++){
+                Arrays.fill(visited[i][j], Integer.MAX_VALUE);
+            }
         }
-
+        
+        visited[0][0][1] = 0;
+        visited[0][0][2] = 0;
+        q.add(new Node(0, 0, 1, 0));
+        q.add(new Node(0, 0, 3, 0));
+        
         while(!q.isEmpty()){
-            int[] cur = q.poll();
-            int uy = cur[0];
-            int ux = cur[1];
-            int dir = cur[2];
-
+            Node cur = q.poll();
+            
+            if(cur.r == n-1 && cur.c == n-1){
+               answer = Math.min(answer, visited[n-1][n-1][cur.dir]); 
+            }
+            
             for(int i=0; i<4; i++){
-                int ddy = uy + dy[i];
-                int ddx = ux + dx[i];
-
-                if(!inRange(ddy, ddx)) continue;
-                if(board[ddy][ddx] == 1) continue;
-
-                int newCost = cost[uy][ux][dir] + (dir == i ? 100 : 600);
-
-                if(cost[ddy][ddx][i] > newCost){
-                    cost[ddy][ddx][i] = newCost;
-                    q.add(new int[]{ddy, ddx, i});
+                int ny = cur.r + dy[i];
+                int nx = cur.c + dx[i];
+                
+                int roadCost = (cur.dir == i ? 100 : 600);
+                if(!inRange(ny, nx)) continue;
+                if(board[ny][nx] == 1) continue;
+                
+                if(visited[ny][nx][i] > cur.cost + roadCost){
+                    visited[ny][nx][i] = cur.cost + roadCost;
+                    q.add(new Node(ny, nx, i, cur.cost + roadCost));    
                 }
+                
             }
         }
     }
     
     public int solution(int[][] board) {
-        Solution.board = board;
+        answer = Integer.MAX_VALUE;
+        
+        this.board = board;
         n = board.length;
-
-        cost = new int[n][n][4];
-
-        for(int i=0; i<n; i++){
-            for(int j=0; j<n; j++){
-                Arrays.fill(cost[i][j], Integer.MAX_VALUE);
-            }
-        }
-
+        
         bfs(0, 0);
-
-        return Math.min(
-                Math.min(cost[n-1][n-1][0], cost[n-1][n-1][1]),
-                Math.min(cost[n-1][n-1][2], cost[n-1][n-1][3])
-        );
+        
+        return answer;
     }
 }
