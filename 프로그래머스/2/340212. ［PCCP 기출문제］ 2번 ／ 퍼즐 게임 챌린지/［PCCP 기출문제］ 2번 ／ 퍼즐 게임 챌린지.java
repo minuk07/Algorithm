@@ -56,6 +56,6 @@ class Solution {
         }
         
         
-        return left;
+        return right;
     }
 }
