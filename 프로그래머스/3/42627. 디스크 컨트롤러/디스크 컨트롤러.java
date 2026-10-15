@@ -31,12 +31,14 @@ class Solution {
         
         while(idx <= jobs.length - 1){
             
-            while(idx <= jobs.length - 1 && jobs[idx][0] <= time){
+            while(jobs[idx][0] <= time && idx <= jobs.length - 1 ){
                 int start = jobs[idx][0];
                 int take = jobs[idx][1];
                 pq.add(new Disk(idx, start, take));
                 
                 idx++;
+                
+                if(idx >= jobs.length) break;
             }
             
             if(!pq.isEmpty()){
