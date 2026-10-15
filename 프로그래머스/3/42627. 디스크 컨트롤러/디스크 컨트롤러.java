@@ -2,12 +2,11 @@ import java.util.*;
 
 class Solution {
     
-    static class Job{
-        
+    class Disk{
         int idx, start, take;
         
-        Job(int idx, int start, int take){
-            this.idx = idx; this.start = start; this.take = take;
+        Disk(int idx, int start, int take){
+            this.idx=idx; this.start=start; this.take=take;
         }
     }
     
@@ -16,38 +15,44 @@ class Solution {
         
         Arrays.sort(jobs, (a,b) -> a[0] - b[0]);
         
-        PriorityQueue<Job> pq = new PriorityQueue<>((a,b) -> {
-            if(a.take != b.take){
-                return a.take - b.take;
-            }
+        PriorityQueue<Disk> pq = new PriorityQueue<>((a,b) -> {
+            if(a.take != b.take) return a.take - b.take;
             
-            if(a.start != b.start){
-                return a.start - b.start;
-            }
+            if(a.start != b.start) return a.start - b.start;
             
             return a.idx - b.idx;
         });
         
-        int cnt = 0;
-        int idx = 0;
-        int time = 0;
         
-        while(cnt < jobs.length){
+        pq.add(new Disk(0, jobs[0][0], jobs[0][1]));
+        
+        int idx = 1;
+        int time = jobs[0][0];
+        
+        while(idx <= jobs.length - 1){
             
-            while(idx < jobs.length && time >= jobs[idx][0]){
-                pq.add(new Job(idx, jobs[idx][0], jobs[idx][1]));
+            while(idx <= jobs.length - 1 && jobs[idx][0] <= time){
+                int start = jobs[idx][0];
+                int take = jobs[idx][1];
+                pq.add(new Disk(idx, start, take));
+                
                 idx++;
             }
             
-            if(pq.isEmpty()){
-                time++;
-            }else{
-                Job cur = pq.poll();
-                
+            if(!pq.isEmpty()){
+                Disk cur = pq.poll();
                 time += cur.take;
                 answer += (time - cur.start);
-                cnt++;
+            }else{
+                time++;
             }
+            
+        }
+        
+        while(!pq.isEmpty()){
+            Disk cur = pq.poll();
+            time += cur.take;
+            answer += (time - cur.start);
         }
         
         return answer / jobs.length;
