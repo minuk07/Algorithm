@@ -29,7 +29,7 @@ class Solution {
             
             for(Node adj : graph[cur.dest]){
                 
-                int newCost = dist[cur.dest] + adj.cost;
+                int newCost = cur.cost + adj.cost;
                 if(dist[adj.dest] > newCost){
                     dist[adj.dest] = newCost;
                     pq.add(new Node(adj.dest, newCost));
