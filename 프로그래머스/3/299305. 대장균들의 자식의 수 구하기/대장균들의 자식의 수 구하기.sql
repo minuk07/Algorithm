@@ -1,0 +1,9 @@
+SELECT ID,
+       (
+        SELECT COUNT(*)
+          FROM ECOLI_DATA D2
+         WHERE D1.ID = D2.PARENT_ID
+       ) AS CHILD_COUNT
+  FROM ECOLI_DATA D1
+ORDER BY ID
+ 
