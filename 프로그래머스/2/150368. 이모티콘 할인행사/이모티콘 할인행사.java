@@ -1,81 +1,77 @@
+import java.util.*;
+
 class Solution {
     
-    static int n, m;
-    static int[][] users;
-    static int[] emoticons;
+    int n, m;
+    int[][] users;
+    int[] emoticons;
     
-    static int[] discount;
-    static int maxPlus = 0;
-    static int maxValue = 0;
+    int bestSum, bestPlus;
     
-    static void calculate(){
+    private void calculate(List<Integer> list){
         
-        
-        int tmpPlus = 0;
-        int tmpValue = 0;
+        int sum = 0;
+        int plus = 0;
         
         for(int[] user : users){
-            int ratio = user[0];
-            int limit = user[1];
-            int myValue = 0;
             
-            for(int j=0; j<m; j++){
-                if(discount[j] >= ratio){
-                    myValue += (int)(emoticons[j] * ((100-discount[j]) * 0.01));
+            int userWant = user[0];
+            int userPrice = user[1];
+            
+            int tmp = 0;
+            
+            for(int i=0; i<m; i++){
+                int emoticon = emoticons[i];
+                int percent = list.get(i);
+                int emoPrice = emoticon * (100 - percent) / 100;
+                
+                if(userWant <= percent){
+                    tmp += emoPrice;
                 }
             }
             
-            if(myValue >= limit){
-                tmpPlus++;
+            if(tmp >= userPrice){
+                plus++;
             }else{
-                tmpValue += myValue;
+                sum += tmp;
             }
-            
-        }
-    
-        
-        if(tmpPlus > maxPlus){
-            maxPlus = tmpPlus;
-            maxValue = tmpValue;
-        }else if(tmpPlus == maxPlus){
-            maxValue = Math.max(maxValue, tmpValue);
-        }
-    }
-    
-    static void dfs(int cnt, int start){
-        if(cnt == m){
-            calculate();
         }
         
-        for(int i=start; i<m; i++){
-            for(int j=10; j<=40; j+=10){
-                if(discount[start] == 0){
-                    discount[i] = j;
-                    dfs(cnt + 1, i + 1);
-                    discount[i] = 0;
-                }
+        if(plus > bestPlus){
+            bestPlus = plus;
+            bestSum = sum;
+        }else if(plus == bestPlus){
+            if(bestSum < sum){
+                bestSum = sum;
             }
         }
     }
     
+    private void dfs(int depth, List<Integer> list){
+        if(depth == m){
+            calculate(list);
+            return;
+        }
         
-        
+        for(int i=10; i<=40; i+=10){
+            list.add(i);
+            dfs(depth + 1, list);
+            list.remove(list.size() - 1);
+        }
+    }
+    
     public int[] solution(int[][] users, int[] emoticons) {
-        int[] answer = new int[2];
-        
-        n = users.length;
-        m = emoticons.length;
         
         this.users = users;
         this.emoticons = emoticons;
         
-        discount = new int[m];
+        n = users.length;
+        m = emoticons.length;
         
-        dfs(0, 0);
+        bestSum = 0;
+        bestPlus = 0;
+        dfs(0, new ArrayList<>());
         
-        answer[0] = maxPlus;
-        answer[1] = maxValue;
-        
-        return answer;
+        return new int[]{bestPlus, bestSum};
     }
 }
