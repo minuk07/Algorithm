@@ -17,7 +17,7 @@ class Solution {
         
         while(!pq.isEmpty()){
             int job = pq.poll();
-            answer += Math.pow(job, 2);
+            answer += (long) Math.pow(job, 2);
         }
         
         return answer;
