@@ -2,102 +2,65 @@ import java.util.*;
 
 class Solution {
     
-    static int[] dy = {0, 1, 0, -1};
-    static int[] dx = {1, 0, -1, 0};
+    int[] dy = {0,0,-1,1};
+    int[] dx = {1,-1,0,0};
     
-    static int n;
-    static int height;
+    int n, height;
+    int[][] land;
+    int[][] map;
+    boolean[][] visited;
+    PriorityQueue<int[]> pq = new PriorityQueue<>((a,b) -> a[2] - b[2]);
+    int[] root;
     
-    static int[][] group;  
-    static int[][] land;
-    static boolean[][] visited;
-    
-    static List<Edge> edges;
-    static int[] root;
-    
-    static class Edge{
-        int from, to, cost;
-        
-        Edge(int from, int to, int cost){
-            this.from = from; this.to = to; this.cost = cost;
-        }
-    }
-    
-    static void printList(int[][] list){
-        for(int i=0; i<list.length; i++){
-            for(int j=0; j<list[i].length; j++){
-                System.out.print(list[i][j] + " ");
+    private void printList(int[][] arr){
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                System.out.print(arr[i][j] + " ");
             }
             System.out.println();
         }
     }
     
-    static boolean inRange(int y, int x){
+    private boolean inRange(int y, int x){
         return (y>=0 && x>=0 && y<n && x<n);
     }
     
-    static void setGroup(int y, int x, int num){
+    private void bfs(int y, int x, int idx){
         Queue<int[]> q = new LinkedList<>();
-        visited[y][x] = true;
         q.add(new int[]{y, x});
-        group[y][x] = num;
+        map[y][x] = idx;
+        visited[y][x] = true;
         
         while(!q.isEmpty()){
             int[] cur = q.poll();
-            int cy = cur[0];
-            int cx = cur[1];
             
             for(int i=0; i<4; i++){
-                int ddy = cy + dy[i];
-                int ddx = cx + dx[i];
+                int ny = cur[0] + dy[i];
+                int nx = cur[1] + dx[i];
                 
-                if(!inRange(ddy, ddx)) continue;
-                if(visited[ddy][ddx]) continue;
-                
-                int between = land[ddy][ddx] - land[cy][cx];
-                if(Math.abs(between) > height) continue;
-                
-                visited[ddy][ddx] = true;
-                q.add(new int[]{ddy, ddx});
-                group[ddy][ddx] = num;
-            }
-        }
-        
-    }
-    
-    static void setGraph(int y, int x){
-        Queue<int[]> q = new LinkedList<>();
-        visited[y][x] = true;
-        q.add(new int[]{y, x});
-        
-        while(!q.isEmpty()){
-            int[] cur = q.poll();
-            int cy = cur[0]; int cx = cur[1];
-            int curGroupIdx = group[cy][cx];
-            int curLand = land[cy][cx];
-            
-            for(int i=0; i<4; i++){
-                int ddy = cy + dy[i];
-                int ddx = cx + dx[i];
-                
-                if(!inRange(ddy, ddx)) continue;
-                if(visited[ddy][ddx]) continue;
-                
-                int nextGroupIdx = group[ddy][ddx];
-                int nextLand = land[ddy][ddx];
-                
-                if(curGroupIdx == nextGroupIdx){
-                    visited[ddy][ddx] = true;
-                    q.add(new int[]{ddy, ddx});
-                }else{
-                    int between = Math.abs(curLand - nextLand);
-                    edges.add(new Edge(curGroupIdx, nextGroupIdx, between));
-                }
+                if(!inRange(ny, nx)) continue;
+                if(visited[ny][nx]) continue;
+                if(Math.abs(land[cur[0]][cur[1]] - land[ny][nx]) > height) continue;
+                q.add(new int[]{ny, nx});
+                visited[ny][nx] = true;
+                map[ny][nx] = idx;
             }
         }
     }
     
-    static int find(int a){
+    private void makeGraph(int y, int x, int idx){
+        for(int i=0; i<4; i++){
+            int ny = y + dy[i];
+            int nx = x + dx[i];
+            
+            if(!inRange(ny, nx)) continue;
+            if(map[y][x] == map[ny][nx]) continue;
+            int cost = Math.abs(land[y][x] - land[ny][nx]);
+            pq.add(new int[]{map[y][x], map[ny][nx], cost});
+        }
+    }
+    
+    private int find(int a){
         if(root[a] == a) return a;
         
         int r = find(root[a]);
@@ -105,60 +68,52 @@ class Solution {
         return r;
     }
     
-    static boolean union(int a, int b){
+    private boolean union(int a, int b){
         int rootA = find(a);
         int rootB = find(b);
         
-        if(rootA != rootB){
-            root[rootB] = rootA;
-            return true;
-        }
-        
-        return false;
+        if(rootA == rootB) return false;
+        root[rootB] = rootA;
+        return true;
     }
     
     public int solution(int[][] land, int height) {
         int answer = 0;
-        
         this.land = land;
         this.height = height;
-        
         n = land.length;
-        
-        group = new int[n][n];
+        map = new int[n][n];
         visited = new boolean[n][n];
         
-        int idx = 0;
+        int idx = 1;
         for(int i=0; i<n; i++){
             for(int j=0; j<n; j++){
                 if(!visited[i][j]){
-                    setGroup(i, j, idx);
-                    idx++;
+                    bfs(i,j,idx++);
                 }
             }
         }
         
-        visited = new boolean[n][n];
-        edges = new ArrayList<>();
-        
         for(int i=0; i<n; i++){
             for(int j=0; j<n; j++){
-                if(!visited[i][j]){
-                    setGraph(i, j);
-                }
+                makeGraph(i, j, map[i][j]);
             }
         }
-        
-        Collections.sort(edges, (a, b) -> a.cost - b.cost);
         
         root = new int[idx];
+        
         for(int i=0; i<idx; i++){
             root[i] = i;
         }
         
-        for(Edge e : edges){
-            if(union(e.from, e.to)){
-                answer += e.cost;
+        while(!pq.isEmpty()){
+            int[] cur = pq.poll();
+            int a = cur[0];
+            int b = cur[1];
+            int c = cur[2];
+            
+            if(union(a,b)){
+                answer += c;
             }
         }
         
