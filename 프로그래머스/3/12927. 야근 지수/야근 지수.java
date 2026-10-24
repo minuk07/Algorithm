@@ -6,24 +6,19 @@ class Solution {
         
         PriorityQueue<Integer> pq = new PriorityQueue<>((a,b) -> b - a);
         
-        for(int i=0; i<works.length; i++){
-            pq.add(works[i]);
+        for(int w : works){
+            pq.add(w);
         }
         
-        while(n>0 && !pq.isEmpty()){
-            n--;
-            int num = pq.poll();
-            
-            if(num <= 0) break;
-            pq.add(num - 1);
+        for(int i=0; i<n; i++){
+            int job = pq.poll() - 1;
+            pq.add(Math.max(job, 0));
         }
-        
-        if(pq.isEmpty()) return answer;
         
         while(!pq.isEmpty()){
-            answer += Math.pow(pq.poll(),2);
+            int job = pq.poll();
+            answer += Math.pow(job, 2);
         }
-        
         
         return answer;
     }
