@@ -15,6 +15,7 @@ class Solution {
             String tmp = "";
             for(int idx : list){
                 tmp += tuple[idx];
+                tmp += ",";
             }
             map.put(tmp, map.getOrDefault(tmp, 0) + 1);
             if(map.get(tmp) >= 2){
