@@ -12,13 +12,13 @@ class Solution {
         Map<String, Integer> map = new HashMap<>();
         
         for(String[] tuple : relation){
-            String tmp = "";
+            StringBuilder sb = new StringBuilder();
             for(int idx : list){
-                tmp += tuple[idx];
-                tmp += ",";
+                sb.append(tuple[idx]);
+                sb.append(",");
             }
-            map.put(tmp, map.getOrDefault(tmp, 0) + 1);
-            if(map.get(tmp) >= 2){
+            map.put(sb.toString(), map.getOrDefault(sb.toString(), 0) + 1);
+            if(map.get(sb.toString()) >= 2){
                 return false;
             }
         }
