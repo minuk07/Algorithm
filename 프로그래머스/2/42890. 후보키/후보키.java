@@ -2,23 +2,22 @@ import java.util.*;
 
 class Solution {
     
-    static int col, row;
-    static boolean[] visited;
-    static List<Integer> list;
-    static String[][] relation;
-    static List<List<Integer>> result;
+    int n;
+    String[][] relation;
+    int answer;
+    List<List<Integer>> candidate;
     
-    static void printList(List<Integer> list){
-        for(int l : list){
-            System.out.print(l + " ");
-        }
-        System.out.println();
-    }
-    
-    static boolean isMinimum(List<Integer> list){
+    private boolean isUnique(List<Integer> list){
         
-        for(List<Integer> l : result){
-            if(list.containsAll(l)){
+        Map<String, Integer> map = new HashMap<>();
+        
+        for(String[] tuple : relation){
+            String tmp = "";
+            for(int idx : list){
+                tmp += tuple[idx];
+            }
+            map.put(tmp, map.getOrDefault(tmp, 0) + 1);
+            if(map.get(tmp) >= 2){
                 return false;
             }
         }
@@ -26,73 +25,38 @@ class Solution {
         return true;
     }
     
-    static boolean isUnique(List<Integer> list){
-        Set<String> set = new HashSet<>();
-        
-        for(int i=0; i<row; i++){
-            
-            String tmp = "";
-            int idx = 0;
-            
-            for(int l : list){
-                tmp += relation[i][l];
-            }
-            
-            set.add(tmp);
-        }
-        
-        if(set.size() == row){
-            return true;
-        }
-        
-        return false;
-    }
-    
-    static void dfs(int idx, int target, int len, List<Integer> list){
-        
-        if(idx >= col) return;
+    private void dfs(int idx, int len, int target, List<Integer> list){
         
         if(target == len){
+            
+            for(List<Integer> key : candidate){
+                if(list.containsAll(key)) return;
+            }
+            
             if(isUnique(list)){
-                
-                if(isMinimum(list)){
-                    result.add(new ArrayList<>(list));
-                }
+                candidate.add(new ArrayList<>(list));
+                answer++;
             }
             return;
         }
         
-        for(int i=idx+1; i<col; i++){
-            
+        for(int i=idx; i<n; i++){
             list.add(i);
-            dfs(i, target, len+1, list);
-            list.remove(list.size() - 1);
+            dfs(i+1, len+1, target, list);
+            list.remove(list.size()-1);
         }
     }
     
     public int solution(String[][] relation) {
-        
+        answer = 0;
         this.relation = relation;
+        n = relation[0].length;
+        candidate = new ArrayList<>();
         
-        col = relation[0].length;
-        row = relation.length;
-        
-        result = new ArrayList<>();
-        
-        for(int target=1; target<=col; target++){
-            
-            visited = new boolean[col];
-            list = new ArrayList<>();
-            
-            for(int idx=0; idx<col; idx++){
-                
-                list.add(idx);
-                dfs(idx, target, 1, list);
-                
-                list.remove(0);
-            }
+        for(int len=1; len<=n; len++){
+            dfs(0, 0, len, new ArrayList<>());
         }
         
-        return result.size();
+        return answer;
     }
 }
