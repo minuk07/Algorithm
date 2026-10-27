@@ -2,87 +2,64 @@ import java.util.*;
 
 class Solution {
     
-    static List<String> list;
-    static int n;
+    List<String> result;
     
-    class Work{
+    class Homework{
         String name;
         int start, take;
         
-        Work(String name, int start, int take){
-            this.name = name; this.start = start; this.take = take;
+        Homework(String name, int start, int take){
+            this.name=name; this.start=start; this.take=take;
         }
     }
     
+    private int getTime(String start){
+        String[] time = start.split(":");
+        int hour = Integer.parseInt(time[0]) * 60;
+        int minute = Integer.parseInt(time[1]);
+        
+        return hour + minute;
+    }
+    
     public String[] solution(String[][] plans) {
+        String[] answer = {};
+        result = new ArrayList<>();
+        int n = plans.length;
+        Arrays.sort(plans, (a,b) -> a[1].compareTo(b[1]));
         
-        list = new ArrayList<>();
-        n = plans.length;
-        
-        List<Work> plan = new ArrayList<>();
-        
-        for(String[] p : plans){
-            String name = p[0];
-            String[] tmp = p[1].split(":");
-            int hour = Integer.parseInt(tmp[0]) * 60;
-            int minute = Integer.parseInt(tmp[1]);
-            
-            int start = hour + minute;
-            int take = Integer.parseInt(p[2]);
-                        
-            plan.add(new Work(name, start, take));
-        }
-        
-        Collections.sort(plan, (a,b) -> a.start - b.start);
-        
-        Stack<Work> stack = new Stack<>();
-        
+        Stack<Homework> stack = new Stack<>();
         
         for(int i=0; i<n-1; i++){
+            Homework cur = new Homework(plans[i][0], getTime(plans[i][1]), Integer.parseInt(plans[i][2]));
+            Homework next = new Homework(plans[i+1][0], getTime(plans[i+1][1]), Integer.parseInt(plans[i+1][2]));
             
-            Work cur = plan.get(i);
-            Work next = plan.get(i+1);
-            
-            int finish = cur.start + cur.take;
-            
-            if(finish <= next.start){ //빨리 끝나는 경우
-                list.add(cur.name);
+            if(cur.start + cur.take > next.start){
+                stack.push(new Homework(cur.name, next.start, cur.start+cur.take-next.start));
+            }else{
+                result.add(cur.name);
                 
-                int time = next.start - finish;
+                int time = next.start - (cur.start + cur.take);
                 
                 while(time > 0 && !stack.isEmpty()){
+                    Homework now = stack.pop();
                     
-                    Work recent = stack.pop();
-                
-                    if(recent.take <= time){
-                        list.add(recent.name);
-                        time -= recent.take;
-                    } else{
-                        recent.take -= time;
-                        stack.push(recent);
+                    if(time >= now.take){
+                        result.add(now.name);
+                        time -= now.take;
+                    }else{
+                        stack.push(new Homework(now.name, next.start, now.take-time));
                         time = 0;
                     }
                 }
-            }else{
-                
-                int remain = finish - next.start;
-                
-                stack.push(new Work(cur.name, next.start, remain));
             }
         }
         
-        list.add(plan.get(n-1).name);
+        result.add(plans[n-1][0]);
         
         while(!stack.isEmpty()){
-            list.add(stack.pop().name);
+            result.add(stack.pop().name);
         }
         
-        String[] answer = new String[n];
-        
-        for(int i=0; i<n; i++){
-            answer[i] = list.get(i);
-        }
-        
-        return answer;
+        return result.toArray(new String[0]);
     }
 }
