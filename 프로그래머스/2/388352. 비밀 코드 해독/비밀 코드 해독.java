@@ -2,102 +2,47 @@ import java.util.*;
 
 class Solution {
     
-    static int answer;
+    int m;
+    int answer;
+    int[][] q;
+    int[] ans;
     
-    static int n, m;
-    static List<List<Integer>> input;
-    static int[] ans;
-    
-    static void printList(List<Integer> list){
-        for(int l : list){
-            System.out.print(l + " ");
-        }
-        System.out.println();
-    }
-    
-    static boolean sameAnswer(int[] secret){
-        for(int i=0; i<m; i++){
-            if(secret[i] != ans[i]){
-                return false;
+    private boolean check(List<Integer> list){
+        
+        int idx = 0;
+        
+        for(int[] secret : q){
+            int tmp = 0;
+            for(int s : secret){
+                if(list.contains(s)) tmp++;
             }
+            if(tmp != ans[idx++]) return false;
         }
         
         return true;
     }
     
-    static int[] getContainsValue(List<Integer> combi){
+    private void dfs(int cur, int n, List<Integer> list){
         
-        int[] secret = new int[m];
-        
-        for(int i=0; i<m; i++){
-            
-            int tmp = 0;
-            for(int a : combi){
-                if(input.get(i).contains(a)){
-                    tmp++;
-                }
-            }
-            
-            secret[i] = tmp;
-        }
-        
-        return secret;
-    }
-    
-    static void dfs(int len, int num, List<Integer> list){
-        
-        if(num > n){
+        if(list.size() == 5){
+            if(check(list)) answer++;
             return;
         }
         
-        if(len == 5){
-            
-            int[] secret = getContainsValue(new ArrayList<>(list));
-            
-            if(sameAnswer(secret)){
-                answer++;
-            }
-            
-            return;
-        }
-        
-        for(int i=num+1 ; i<=n; i++){
+        for(int i=cur; i<=n; i++){
             list.add(i);
-            dfs(len+1, i, list);
+            dfs(i+1, n, list);
             list.remove(list.size() - 1);
         }
-        
     }
-    
     
     public int solution(int n, int[][] q, int[] ans) {
         answer = 0;
-        
-        this.n = n;
+        this.q = q;
         this.ans = ans;
         m = q.length;
         
-        List<Integer> list = new ArrayList<>();
-        
-        input = new ArrayList<>();
-        
-        for(int i=0; i<m; i++){
-            input.add(new ArrayList<>());
-        }
-        
-        for(int i=0; i<m; i++){
-            for(int j=0; j<5; j++){
-                input.get(i).add(q[i][j]);
-            }
-        }
-        
-        for(int i=1; i<=n; i++){
-            list = new ArrayList<>();
-            list.add(i);
-            dfs(1, i, list);
-            list.remove(0);
-        }
-        
+        dfs(1, n, new ArrayList<>());
         
         return answer;
     }
