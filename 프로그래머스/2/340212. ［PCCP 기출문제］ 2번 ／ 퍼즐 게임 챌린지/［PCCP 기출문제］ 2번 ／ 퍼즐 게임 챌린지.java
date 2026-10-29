@@ -2,60 +2,46 @@ import java.util.*;
 
 class Solution {
     
-    List<Puzzle> list;
+    int n;
     
-    class Puzzle{
-        int idx, diff, take;
+    private boolean solve(int level, int[] diffs, int[] times, long limit){
         
-        Puzzle(int idx, int diff, int take){
-            this.idx=idx; this.diff=diff; this.take=take;
-        }
-    }
-    
-    private long canSolve(List<Puzzle> list, int level, long limit){
+        long time = times[0];
         
-        long time = list.get(0).take;
-        
-        for(int i=1; i<list.size(); i++){
-            int time_cur = list.get(i).take;
-            int time_prev = list.get(i-1).take;
-            int diff = list.get(i).diff;
+        for(int i=1; i<n; i++){
+            int diff = diffs[i];
+            int time_cur = times[i];
+            int time_prev = times[i-1];
             
             if(diff <= level){
                 time += time_cur;
             }else{
-                int cnt = diff - level;
-                time += (cnt * (time_prev + time_cur));
-                time += time_cur;
+                time += (diff - level) * (time_cur + time_prev) + time_cur;
             }
         }
         
-        return time;
+        if(time <= limit) return true;
+        else return false;
     }
     
     public int solution(int[] diffs, int[] times, long limit) {
-        int answer = 0;
         
-        list = new ArrayList<>();
+        n = diffs.length;
         
         int left = 1;
-        int right = Integer.MIN_VALUE;
+        int right = 100000;
         
-        for(int i=0; i<diffs.length; i++){
-            list.add(new Puzzle(i, diffs[i], times[i]));
-            right = Math.max(right, diffs[i]);
-        }
         
         while(left < right){
-            int mid = left + (right - left) / 2;
-            if(canSolve(list, mid, limit) <= limit){                
-                right = mid; 
+            int mid = left + (right-left)/2;
+            
+            if(solve(mid, diffs, times, limit)){
+                right = mid;
             }else{
                 left = mid + 1;
             }
         }
         
-        
-        return right;
+        return left;
     }
 }
