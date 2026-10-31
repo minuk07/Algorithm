@@ -2,51 +2,51 @@ import java.util.*;
 
 class Solution {
     
+    int n;
     Map<String, List<Integer>> map;
     
-    private void dfs(String[] app, String combi, int depth){
-        if(depth == 4){
-            map.computeIfAbsent(combi, k -> new ArrayList<>()).add(Integer.parseInt(app[4]));
+    private void dfs(int idx, String str, int score, String[] info){
+        if(idx >= 4){
+            map.computeIfAbsent(str, k -> new ArrayList<>()).add(score);
             return;
         }
         
-        dfs(app, combi + app[depth], depth+1);
-        dfs(app, combi + "-", depth+1);
-    } 
-    
-    private String makeKey(String[] query){
-        String key = "";
+        dfs(idx+1, str + "-", score, info);
+        dfs(idx+1, str + info[idx], score, info);
         
-        for(int i=0; i<query.length - 1; i+=2){
-            key += query[i];
-        }
-        
-        return key;
     }
     
     public int[] solution(String[] info, String[] query) {
-        List<Integer> list = new ArrayList<>();
+        int[] answer = new int[query.length];
+        n = info.length;
         map = new HashMap<>();
         
-        for(String app : info){
-            dfs(app.split(" "), "", 0);
+        for(int i=0; i<n; i++){
+            String[] information = info[i].split(" ");
+            int score = Integer.parseInt(information[4]);
+            dfs(0, "", score, information);
         }
         
         for(String key : map.keySet()){
             Collections.sort(map.get(key));
         }
         
-        for(String q : query){
-            String[] tmp = q.split(" ");
-            String key = makeKey(tmp);
-            int score = Integer.parseInt(tmp[tmp.length -1]);
+        for(int i=0; i<query.length; i++){
+            String[] tmp = query[i].split(" ");
+            String q = "";
+            for(int j=0; j<tmp.length-1; j++){
+                if(tmp[j].equals("and")) continue;
+                q += tmp[j];
+            }
             
-            if(map.get(key) == null){
-                list.add(0);
+            int score = Integer.parseInt(tmp[tmp.length-1]);
+            
+            if(map.get(q) == null){
+                answer[i] = 0;
                 continue;
             }
             
-            List<Integer> scores = map.get(key);
+            List<Integer> scores = map.get(q);
             
             int left = 0;
             int right = scores.size();
@@ -54,20 +54,14 @@ class Solution {
             while(left < right){
                 int mid = left + (right - left) / 2;
                 
-                if(scores.get(mid) < score){
-                    left = mid + 1;
-                }else{
+                if(scores.get(mid) >= score){
                     right = mid;
+                }else{
+                    left = mid + 1;
                 }
             }
             
-            list.add(scores.size() - left);
-        }
-        
-        int[] answer = new int[query.length];
-        
-        for(int i=0; i<query.length; i++){
-            answer[i] = list.get(i);
+            answer[i] = scores.size() - left;
         }
         
         return answer;
