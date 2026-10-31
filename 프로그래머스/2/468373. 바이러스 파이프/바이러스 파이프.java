@@ -2,37 +2,38 @@ import java.util.*;
 
 class Solution {
     
-    static List<Node>[] graph;
-    static boolean[] visited;
-    static int answer;
-    static int n;
+    List<Node>[] graph;
+    boolean[] visited;
+    int n;
+    int answer;
     
-    static class Node{
-        int dest, pipe;
+    class Node{
+        int dest, type;
         
-        Node(int dest, int pipe){
-            this.dest = dest; this.pipe = pipe;
+        Node(int dest, int type){
+            this.dest=dest; this.type=type;
         }
     }
     
-    static void bfs(int cnt, int k){
-        if(k == cnt){
-            int infected = 0;
+    
+    private void dfs(int cnt, int k){
+        if(cnt == k){
+            
+            int result = 0;
             for(int i=1; i<=n; i++){
-                if(visited[i]) infected++;
+                if(visited[i]) result++;
             }
-            answer = Math.max(answer, infected);
+            answer = Math.max(result, answer);
+            
             return;
         }
         
-        for(int t=1; t<=3; t++){
-            List<Integer> newNode = new ArrayList<>();
+        for(int type=1; type<=3; type++){
+            List<Integer> list = new ArrayList<>();
             Queue<Integer> q = new LinkedList<>();
             
             for(int i=1; i<=n; i++){
-                if(visited[i]){
-                    q.add(i);
-                }
+                if(visited[i]) q.add(i);
             }
             
             while(!q.isEmpty()){
@@ -40,20 +41,21 @@ class Solution {
                 
                 for(Node adj : graph[cur]){
                     if(visited[adj.dest]) continue;
-                    if(t != adj.pipe) continue;
+                    if(adj.type != type) continue;
                     
-                    visited[adj.dest] = true;
-                    newNode.add(adj.dest);
                     q.add(adj.dest);
+                    list.add(adj.dest);
+                    visited[adj.dest] = true;
                 }
             }
             
-            bfs(cnt+1, k);
+            dfs(cnt+1, k);
             
-            for(int node : newNode){
-                visited[node] = false;
+            for(int l : list){
+                visited[l] = false;
             }
         }
+        
     }
     
     public int solution(int n, int infection, int[][] edges, int k) {
@@ -61,24 +63,24 @@ class Solution {
         
         graph = new ArrayList[n+1];
         this.n = n;
-        
         for(int i=0; i<=n; i++){
             graph[i] = new ArrayList<>();
         }
         
         for(int[] edge : edges){
-            int a = edge[0];
-            int b = edge[1];
-            int pipe = edge[2];
+            int v1 = edge[0];
+            int v2 = edge[1];
+            int type = edge[2];
             
-            graph[a].add(new Node(b, pipe));
-            graph[b].add(new Node(a, pipe));
+            graph[v1].add(new Node(v2, type));
+            graph[v2].add(new Node(v1, type));
         }
         
         visited = new boolean[n+1];
+        
         visited[infection] = true;
         
-        bfs(0, k);
+        dfs(0, k);
         
         return answer;
     }
