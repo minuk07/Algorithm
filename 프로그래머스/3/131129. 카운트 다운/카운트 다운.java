@@ -35,11 +35,12 @@ class Solution {
     }
     
     private void shoot(int cur, int prev, int isBullOrSingle){
-        if(dp[cur][0] > dp[prev][0] + 1){
-            dp[cur][0] = dp[prev][0] + 1;
-            dp[cur][1] = dp[prev][1] + isBullOrSingle;
-        }else if(dp[cur][0] == dp[prev][0] + 1 && isBullOrSingle == 1){
-            dp[cur][1] = Math.max(dp[cur][1], dp[prev][1] + isBullOrSingle);
+        int newCnt = dp[prev][0] + 1;
+        int newSum = dp[prev][1] + isBullOrSingle;
+        
+        if(dp[cur][0] > newCnt || (dp[cur][0] == newCnt && dp[cur][1] < newSum)){
+            dp[cur][0] = newCnt;
+            dp[cur][1] = newSum;
         }
     }
 }
