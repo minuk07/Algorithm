@@ -8,13 +8,14 @@ class Solution {
         int pickup = 0;
         
         for(int i=n-1; i>=0; i--){
-            deliver -= deliveries[i];
-            pickup -= pickups[i];
+            deliver += deliveries[i];
+            pickup += pickups[i];
             
-            while(deliver < 0 || pickup < 0){
-                answer += (long) (i+1) * 2;
-                pickup += cap;
-                deliver += cap;
+            while(deliver > 0 || pickup > 0){
+                pickup -= cap;
+                deliver -= cap;
+                
+                answer += (long)(i+1)*2;
             }
         }
         
