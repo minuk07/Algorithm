@@ -1,68 +1,45 @@
 import java.util.*;
 
 class Solution {
+    
+    int[][] dp;
+    
     public int[] solution(int target) {
-        int[] answer = new int[2];
         
-        int[][] dp = new int[target+1][2];
-        
-        for(int i=0; i<=target; i++){
-            dp[i][0] = Integer.MAX_VALUE;
-            dp[i][1] = 0;
-        }
-        
-        dp[0][0] = 0;
+        dp = new int[target+1][2];
         
         for(int i=1; i<=target; i++){
+            dp[i][0] = Integer.MAX_VALUE;
+        }
+        
+        for(int i=1; i<=target; i++){
+            
+            if(i - 50 >= 0){
+                shoot(i, i-50, 1);
+            }
+            
             for(int j=1; j<=20; j++){
-                
-                if(i-50 >= 0){
-                    if(dp[i][0] > dp[i-50][0] + 1){
-                        dp[i][0] = dp[i-50][0] + 1;
-                        dp[i][1] = dp[i-50][1] + 1;
-                    }
-                    else if(dp[i][0] == dp[i-50][0] + 1){
-                        dp[i][1] = Math.max(dp[i][1], dp[i-50][1] + 1);
-                    }
-                }
-                
                 if(i-j >= 0){
-                    if(dp[i][0] > dp[i-j][0] + 1){
-                        dp[i][0] = dp[i-j][0] + 1;
-                        dp[i][1] = dp[i-j][1] + 1;
-                    }
-                    else if(dp[i][0] == dp[i-j][0] + 1){
-                        dp[i][1] = Math.max(dp[i][1], dp[i-j][1] + 1);
-                    }
+                    shoot(i, i-j, 1);
                 }
-                
-                if(i - (2*j) >= 0){
-                    int temp = 2*j;
-                    if(dp[i][0] > dp[i-temp][0] + 1){
-                        dp[i][0] = dp[i-temp][0] + 1;
-                        dp[i][1] = dp[i-temp][1];
-                    }
-                    else if(dp[i][0] == dp[i-temp][0] + 1){
-                        dp[i][1] = Math.max(dp[i][1], dp[i-temp][1]);
-                    }
+                if(i- (j*2) >= 0){
+                    shoot(i, i-(j*2), 0);
                 }
-                
-                if(i - (3*j) >= 0){
-                    int temp = 3*j;
-                    if(dp[i][0] > dp[i-temp][0] + 1){
-                        dp[i][0] = dp[i-temp][0] + 1;
-                        dp[i][1] = dp[i-temp][1];
-                    }
-                    else if(dp[i][0] == dp[i-temp][0] + 1){
-                        dp[i][1] = Math.max(dp[i][1], dp[i-temp][1]);
-                    }
+                if(i-(j*3) >=0){
+                    shoot(i, i-(j*3), 0);
                 }
             }
         }
         
-        answer[0] = dp[target][0];
-        answer[1] = dp[target][1];
-        
-        return answer;
+        return new int[]{dp[target][0], dp[target][1]};
+    }
+    
+    private void shoot(int cur, int prev, int isBullOrSingle){
+        if(dp[cur][0] > dp[prev][0] + 1){
+            dp[cur][0] = dp[prev][0] + 1;
+            dp[cur][1] = dp[prev][1] + isBullOrSingle;
+        }else if(dp[cur][0] == dp[prev][0] + isBullOrSingle && isBullOrSingle == 1){
+            dp[cur][1] = Math.max(dp[cur][1], dp[prev][1] + isBullOrSingle);
+        }
     }
 }
