@@ -38,7 +38,7 @@ class Solution {
         if(dp[cur][0] > dp[prev][0] + 1){
             dp[cur][0] = dp[prev][0] + 1;
             dp[cur][1] = dp[prev][1] + isBullOrSingle;
-        }else if(dp[cur][0] == dp[prev][0] + isBullOrSingle && isBullOrSingle == 1){
+        }else if(dp[cur][0] == dp[prev][0] + 1 && isBullOrSingle == 1){
             dp[cur][1] = Math.max(dp[cur][1], dp[prev][1] + isBullOrSingle);
         }
     }
