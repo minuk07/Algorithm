@@ -1,7 +1,7 @@
+import java.util.*;
+
 class Solution {
-    
     public long solution(int cap, int n, int[] deliveries, int[] pickups) {
-        
         long answer = 0;
         
         int deliver = 0;
@@ -12,9 +12,9 @@ class Solution {
             pickup -= pickups[i];
             
             while(deliver < 0 || pickup < 0){
-                answer += (long)(i+1) * 2;
-                deliver += cap;
+                answer += (long) (i+1) * 2;
                 pickup += cap;
+                deliver += cap;
             }
         }
         
